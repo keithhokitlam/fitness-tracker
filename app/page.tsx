@@ -248,9 +248,14 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-              Track your workouts and discover how many calories you burned with AI-powered insights
-            </p>
+            <div className="max-w-md mx-auto">
+              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400">
+                Track your workouts and discover how many calories you burned with AI-powered insights
+              </p>
+              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-500 mt-1">
+                記錄您的運動並透過 AI 驅動的洞察發現您燃燒了多少卡路里
+              </p>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
