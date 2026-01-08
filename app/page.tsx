@@ -174,7 +174,7 @@ export default function Home() {
         {/* Header Card */}
         <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 mb-6 border border-gray-100 dark:border-gray-700">
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-4 mb-3">
+            <div className="flex items-center justify-center gap-2 mb-3">
               <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 flex-shrink-0">
                 <Image
                   src="/logos/Main Logo.png"
