@@ -189,10 +189,10 @@ export default function Home() {
                 />
               </div>
               {/* 3D Metal Plate Background behind Fitness Tracker text */}
-              <div className="relative">
+              <div className="relative inline-block">
                 {/* Metal Plate Background */}
                 <div 
-                  className="absolute inset-0 rounded-lg -z-10"
+                  className="absolute inset-0 rounded-lg"
                   style={{
                     background: 'linear-gradient(135deg, #c0c0c0 0%, #808080 25%, #a0a0a0 50%, #606060 75%, #808080 100%)',
                     boxShadow: `
@@ -204,8 +204,11 @@ export default function Home() {
                     `,
                     transform: 'perspective(1000px) rotateX(5deg) rotateY(-5deg)',
                     border: '2px solid rgba(255, 255, 255, 0.2)',
-                    padding: '1rem',
-                    margin: '-1rem',
+                    top: '-0.5rem',
+                    left: '-1rem',
+                    right: '-1rem',
+                    bottom: '-0.5rem',
+                    zIndex: -1,
                   }}
                 >
                   {/* Metal texture overlay */}
@@ -219,7 +222,7 @@ export default function Home() {
                     }}
                   />
                 </div>
-                <div className="relative">
+                <div className="relative" style={{ zIndex: 1 }}>
                   <h1 
                     className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight px-4 py-2"
                     style={{
