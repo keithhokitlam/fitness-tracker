@@ -175,18 +175,51 @@ export default function Home() {
         <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 mb-6 border border-gray-100 dark:border-gray-700">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-3">
-              <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 flex-shrink-0">
-                <Image
-                  src="/logos/Main Logo.png"
-                  alt="Fitness Tracker Logo"
-                  fill
-                  className="object-contain"
+              {/* 3D Metal Plate Background with Logo */}
+              <div className="relative flex-shrink-0">
+                {/* Metal Plate Background */}
+                <div 
+                  className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-lg"
                   style={{
-                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))',
+                    background: 'linear-gradient(135deg, #c0c0c0 0%, #808080 25%, #a0a0a0 50%, #606060 75%, #808080 100%)',
+                    boxShadow: `
+                      inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                      inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+                      0 8px 16px rgba(0, 0, 0, 0.4),
+                      0 4px 8px rgba(0, 0, 0, 0.3),
+                      0 0 0 2px rgba(0, 0, 0, 0.1)
+                    `,
+                    transform: 'perspective(1000px) rotateX(5deg) rotateY(-5deg)',
+                    border: '2px solid rgba(255, 255, 255, 0.2)',
+                    position: 'relative',
+                    overflow: 'hidden',
                   }}
-                  priority
-                  unoptimized
-                />
+                >
+                  {/* Metal texture overlay */}
+                  <div 
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                      backgroundImage: `
+                        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px),
+                        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)
+                      `,
+                    }}
+                  />
+                  {/* Logo on top of metal plate */}
+                  <div className="relative w-full h-full">
+                    <Image
+                      src="/logos/Main Logo.png"
+                      alt="Fitness Tracker Logo"
+                      fill
+                      className="object-contain p-2"
+                      style={{
+                        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
+                      }}
+                      priority
+                      unoptimized
+                    />
+                  </div>
+                </div>
               </div>
               <div>
                 <h1 
