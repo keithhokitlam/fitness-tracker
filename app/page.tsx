@@ -27,45 +27,29 @@ export default function Home() {
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistory[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
 
-  // Generate or load unique user ID
+  // Load workout history and weight from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Get or create unique user ID
-      let userId = localStorage.getItem('fitness-tracker-user-id');
-      if (!userId) {
-        // Generate a unique ID
-        userId = `user-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-        localStorage.setItem('fitness-tracker-user-id', userId);
+      const saved = localStorage.getItem('fitness-tracker-history');
+      if (saved) {
+        try {
+          setWorkoutHistory(JSON.parse(saved));
+        } catch (e) {
+          console.error('Error loading workout history:', e);
+        }
       }
-      setUserId(userId);
-
-      // Load weight unit preference
+      
+      // Only load weight unit preference, not the weight value itself
       const savedWeightUnit = localStorage.getItem('fitness-tracker-weight-unit');
       if (savedWeightUnit) {
         setWeightUnit(savedWeightUnit);
       } else {
+        // Default to lbs if no saved preference
         setWeightUnit('lbs');
       }
     }
   }, []);
-
-  // Load workout history from server when userId is available
-  useEffect(() => {
-    if (userId) {
-      fetch(`/api/workouts?userId=${encodeURIComponent(userId)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.workouts) {
-            setWorkoutHistory(data.workouts);
-          }
-        })
-        .catch(err => {
-          console.error('Error loading workout history:', err);
-        });
-    }
-  }, [userId]);
 
   // Only save weight unit preference, not the weight value itself
   useEffect(() => {
@@ -74,96 +58,46 @@ export default function Home() {
     }
   }, [weightUnit]);
 
-  // Workout history is now stored server-side, no need to save to localStorage
+  // Save workout history to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && workoutHistory.length > 0) {
+      localStorage.setItem('fitness-tracker-history', JSON.stringify(workoutHistory));
+    }
+  }, [workoutHistory]);
 
-  const addToHistory = async (workout: { 
+  const addToHistory = (workout: { 
     calories: number; 
     workoutType: string; 
     duration: number;
     explanation?: string;
   }) => {
-    if (!userId) return;
-
-    try {
-      const response = await fetch('/api/workouts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          workout,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok && data.workout) {
-        // Add to local state
-        setWorkoutHistory(prev => [data.workout, ...prev]);
-      }
-    } catch (error) {
-      console.error('Error saving workout to server:', error);
-      // Fallback: still add to local state
-      const newWorkout: WorkoutHistory = {
-        id: Date.now().toString(),
-        ...workout,
-        timestamp: new Date().toISOString(),
-      };
-      setWorkoutHistory(prev => [newWorkout, ...prev]);
-    }
+    const newWorkout: WorkoutHistory = {
+      id: Date.now().toString(),
+      ...workout,
+      timestamp: new Date().toISOString(),
+    };
+    setWorkoutHistory(prev => [newWorkout, ...prev]);
   };
 
-  const clearHistory = async () => {
+  const clearHistory = () => {
     if (confirm('Are you sure you want to clear all workout history?')) {
-      if (!userId) return;
-      
-      // Delete all workouts for this user
-      try {
-        for (const workout of workoutHistory) {
-          await fetch('/api/workouts', {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId,
-              workoutId: workout.id,
-            }),
-          });
-        }
-        setWorkoutHistory([]);
-      } catch (error) {
-        console.error('Error clearing history:', error);
-        setWorkoutHistory([]);
+      setWorkoutHistory([]);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('fitness-tracker-history');
       }
     }
   };
 
-  const deleteWorkout = async (id: string) => {
+  const deleteWorkout = (id: string) => {
     if (confirm('Are you sure you want to delete this workout?')) {
-      if (!userId) return;
-
-      try {
-        const response = await fetch('/api/workouts', {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId,
-            workoutId: id,
-          }),
-        });
-
-        if (response.ok) {
-          const updatedHistory = workoutHistory.filter(workout => workout.id !== id);
-          setWorkoutHistory(updatedHistory);
+      const updatedHistory = workoutHistory.filter(workout => workout.id !== id);
+      setWorkoutHistory(updatedHistory);
+      if (typeof window !== 'undefined') {
+        if (updatedHistory.length > 0) {
+          localStorage.setItem('fitness-tracker-history', JSON.stringify(updatedHistory));
+        } else {
+          localStorage.removeItem('fitness-tracker-history');
         }
-      } catch (error) {
-        console.error('Error deleting workout:', error);
-        // Fallback: remove from local state
-        const updatedHistory = workoutHistory.filter(workout => workout.id !== id);
-        setWorkoutHistory(updatedHistory);
       }
     }
   };
