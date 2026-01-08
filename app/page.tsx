@@ -189,59 +189,58 @@ export default function Home() {
                 />
               </div>
               {/* 3D Metal Plate Background behind Fitness Tracker text */}
-              <div className="relative inline-block">
-                {/* Metal Plate Background */}
+              <div 
+                className="relative inline-block px-6 py-4 rounded-lg"
+                style={{
+                  background: 'linear-gradient(135deg, #c0c0c0 0%, #808080 25%, #a0a0a0 50%, #606060 75%, #808080 100%)',
+                  boxShadow: `
+                    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+                    0 8px 16px rgba(0, 0, 0, 0.4),
+                    0 4px 8px rgba(0, 0, 0, 0.3),
+                    0 0 0 2px rgba(0, 0, 0, 0.1)
+                  `,
+                  transform: 'perspective(1000px) rotateX(5deg) rotateY(-5deg)',
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
+                  position: 'relative',
+                  overflow: 'visible',
+                }}
+              >
+                {/* Metal texture overlay */}
                 <div 
-                  className="absolute inset-0 rounded-lg"
+                  className="absolute inset-0 opacity-30 rounded-lg"
                   style={{
-                    background: 'linear-gradient(135deg, #c0c0c0 0%, #808080 25%, #a0a0a0 50%, #606060 75%, #808080 100%)',
-                    boxShadow: `
-                      inset 0 2px 4px rgba(255, 255, 255, 0.3),
-                      inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-                      0 8px 16px rgba(0, 0, 0, 0.4),
-                      0 4px 8px rgba(0, 0, 0, 0.3),
-                      0 0 0 2px rgba(0, 0, 0, 0.1)
+                    backgroundImage: `
+                      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px),
+                      repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)
                     `,
-                    transform: 'perspective(1000px) rotateX(5deg) rotateY(-5deg)',
-                    border: '2px solid rgba(255, 255, 255, 0.2)',
-                    top: '-0.5rem',
-                    left: '-1rem',
-                    right: '-1rem',
-                    bottom: '-0.5rem',
-                    zIndex: -1,
+                    pointerEvents: 'none',
                   }}
-                >
-                  {/* Metal texture overlay */}
-                  <div 
-                    className="absolute inset-0 opacity-30 rounded-lg"
-                    style={{
-                      backgroundImage: `
-                        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px),
-                        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)
-                      `,
-                    }}
-                  />
-                </div>
-                <div className="relative" style={{ zIndex: 1 }}>
+                />
+                <div className="relative" style={{ zIndex: 2, position: 'relative' }}>
                   <h1 
-                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight px-4 py-2"
+                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight"
                     style={{
                       fontFamily: "'Althetic', 'Arial Black', 'Impact', sans-serif",
                       textShadow: '4px 4px 8px rgba(0, 0, 0, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.5)',
                       letterSpacing: '0.05em',
                       fontWeight: 'normal',
                       lineHeight: '1.1',
+                      position: 'relative',
+                      zIndex: 2,
                     }}
                   >
                     <div>Fitness</div>
                     <div>Tracker</div>
                   </h1>
                   <p 
-                    className="text-4xl sm:text-5xl md:text-6xl text-white mt-1 px-4"
+                    className="text-4xl sm:text-5xl md:text-6xl text-white mt-1"
                     style={{
                       fontFamily: "'Chicago Athletic', Arial, sans-serif",
                       textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.9)',
                       fontWeight: 'normal',
+                      position: 'relative',
+                      zIndex: 2,
                     }}
                   >
                     by Keith L
