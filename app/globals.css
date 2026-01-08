@@ -3,7 +3,8 @@
 /* Althetic Font by Edward A. Leach */
 @font-face {
   font-family: 'Althetic';
-  src: url('/fonts/Althetic.ttf') format('truetype'),
+  src: url('/fonts/Althetic.TTF') format('truetype'),
+       url('/fonts/Althetic.ttf') format('truetype'),
        url('/fonts/Althetic.otf') format('opentype'),
        url('/fonts/althetic.ttf') format('truetype'),
        url('/fonts/althetic.otf') format('opentype'),
