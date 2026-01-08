@@ -175,11 +175,24 @@ export default function Home() {
         <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 mb-6 border border-gray-100 dark:border-gray-700">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-3">
-              {/* 3D Metal Plate Background with Logo */}
-              <div className="relative flex-shrink-0">
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 flex-shrink-0">
+                <Image
+                  src="/logos/Main Logo.png"
+                  alt="Fitness Tracker Logo"
+                  fill
+                  className="object-contain"
+                  style={{
+                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))',
+                  }}
+                  priority
+                  unoptimized
+                />
+              </div>
+              {/* 3D Metal Plate Background behind Fitness Tracker text */}
+              <div className="relative">
                 {/* Metal Plate Background */}
                 <div 
-                  className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-lg"
+                  className="absolute inset-0 rounded-lg -z-10"
                   style={{
                     background: 'linear-gradient(135deg, #c0c0c0 0%, #808080 25%, #a0a0a0 50%, #606060 75%, #808080 100%)',
                     boxShadow: `
@@ -191,13 +204,13 @@ export default function Home() {
                     `,
                     transform: 'perspective(1000px) rotateX(5deg) rotateY(-5deg)',
                     border: '2px solid rgba(255, 255, 255, 0.2)',
-                    position: 'relative',
-                    overflow: 'hidden',
+                    padding: '1rem',
+                    margin: '-1rem',
                   }}
                 >
                   {/* Metal texture overlay */}
                   <div 
-                    className="absolute inset-0 opacity-30"
+                    className="absolute inset-0 opacity-30 rounded-lg"
                     style={{
                       backgroundImage: `
                         repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px),
@@ -205,46 +218,32 @@ export default function Home() {
                       `,
                     }}
                   />
-                  {/* Logo on top of metal plate */}
-                  <div className="relative w-full h-full">
-                    <Image
-                      src="/logos/Main Logo.png"
-                      alt="Fitness Tracker Logo"
-                      fill
-                      className="object-contain p-2"
-                      style={{
-                        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
-                      }}
-                      priority
-                      unoptimized
-                    />
-                  </div>
                 </div>
-              </div>
-              <div>
-                <h1 
-                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight"
-                  style={{
-                    fontFamily: "'Althetic', 'Arial Black', 'Impact', sans-serif",
-                    textShadow: '4px 4px 8px rgba(0, 0, 0, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.5)',
-                    letterSpacing: '0.05em',
-                    fontWeight: 'normal',
-                    lineHeight: '1.1',
-                  }}
-                >
-                  <div>Fitness</div>
-                  <div>Tracker</div>
-                </h1>
-                <p 
-                  className="text-4xl sm:text-5xl md:text-6xl text-white mt-1"
-                  style={{
-                    fontFamily: "'Chicago Athletic', Arial, sans-serif",
-                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.9)',
-                    fontWeight: 'normal',
-                  }}
-                >
-                  by Keith L
-                </p>
+                <div className="relative">
+                  <h1 
+                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight px-4 py-2"
+                    style={{
+                      fontFamily: "'Althetic', 'Arial Black', 'Impact', sans-serif",
+                      textShadow: '4px 4px 8px rgba(0, 0, 0, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.5)',
+                      letterSpacing: '0.05em',
+                      fontWeight: 'normal',
+                      lineHeight: '1.1',
+                    }}
+                  >
+                    <div>Fitness</div>
+                    <div>Tracker</div>
+                  </h1>
+                  <p 
+                    className="text-4xl sm:text-5xl md:text-6xl text-white mt-1 px-4"
+                    style={{
+                      fontFamily: "'Chicago Athletic', Arial, sans-serif",
+                      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.9)',
+                      fontWeight: 'normal',
+                    }}
+                  >
+                    by Keith L
+                  </p>
+                </div>
               </div>
             </div>
             <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto">
