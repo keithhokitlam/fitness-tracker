@@ -307,6 +307,12 @@ export default function Home() {
               <p className="text-sm sm:text-base text-gray-500 dark:text-gray-500 mt-1">
                 記錄您的運動並透過 AI 驅動的洞察發現您燃燒了多少卡路里
               </p>
+              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mt-2">
+                Try typing "run" or "running" where it gives more optional fields to fill out or "push ups" for the duration field to change to Reps instead!
+              </p>
+              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-500 mt-1">
+                試著輸入「run」或「running」以獲得更多可選欄位，或輸入「push ups」將持續時間欄位改為次數！
+              </p>
             </div>
           </div>
 
