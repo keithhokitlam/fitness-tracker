@@ -12,22 +12,60 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { workoutType, duration, runningPace, weight, weightUnit } = body;
+    const { workoutType, duration, reps, runningPace, weight, weightUnit } = body;
+
+    // Helper function to check if workout is a push-up variation
+    const isPushUp = (workout: string): boolean => {
+      if (!workout) return false;
+      const trimmed = workout.trim();
+      if (!trimmed) return false;
+      
+      // Convert to lowercase and remove all spaces and hyphens
+      const normalized = trimmed.toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
+      
+      // Check if it matches pushup variations
+      // This handles: "push up", "push-up", "pushup", "pushups", "push ups", etc.
+      return normalized === 'pushup' || normalized === 'pushups' || normalized.startsWith('pushup');
+    };
+
+    const isPushUpWorkout = isPushUp(workoutType || '');
 
     // Validate input
-    if (!workoutType || !duration) {
+    if (!workoutType) {
       return NextResponse.json(
-        { error: 'Workout type and duration are required' },
+        { error: 'Workout type is required' },
         { status: 400 }
       );
     }
 
-    const durationNum = parseFloat(duration);
-    if (isNaN(durationNum) || durationNum <= 0) {
-      return NextResponse.json(
-        { error: 'Duration must be a positive number' },
-        { status: 400 }
-      );
+    if (isPushUpWorkout) {
+      if (!reps) {
+        return NextResponse.json(
+          { error: 'Reps are required for push-up workouts' },
+          { status: 400 }
+        );
+      }
+      const repsNum = parseInt(reps);
+      if (isNaN(repsNum) || repsNum <= 0) {
+        return NextResponse.json(
+          { error: 'Reps must be a positive whole number' },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (!duration) {
+        return NextResponse.json(
+          { error: 'Duration is required' },
+          { status: 400 }
+        );
+      }
+      const durationNum = parseFloat(duration);
+      if (isNaN(durationNum) || durationNum <= 0) {
+        return NextResponse.json(
+          { error: 'Duration must be a positive number' },
+          { status: 400 }
+        );
+      }
     }
 
     // Check if API key is configured
@@ -89,10 +127,15 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    // Build workout info string
+    const workoutInfo = isPushUpWorkout 
+      ? `Reps: ${parseInt(reps)}`
+      : `Duration: ${parseFloat(duration)} minutes`;
+    
     const prompt = `Calculate the approximate number of calories burned for the following workout:
     
 Workout Type: ${workoutType}
-Duration: ${durationNum} minutes${paceInfo}${weightInfo}${paceGuidance}
+${workoutInfo}${paceInfo}${weightInfo}${paceGuidance}
 
 Please provide:
 1. The estimated number of calories burned (as a single number, no text)
@@ -150,12 +193,23 @@ Format your response as JSON with this structure:
       throw new Error('Invalid calorie calculation from OpenAI');
     }
 
-    return NextResponse.json({
+    const responseData: any = {
       calories: Math.round(result.calories),
-      explanation: result.explanation || 'Calories calculated based on workout type and duration.',
+      explanation: result.explanation || (isPushUpWorkout 
+        ? 'Calories calculated based on workout type and reps.' 
+        : 'Calories calculated based on workout type and duration.'),
       workoutType,
-      duration: durationNum,
-    });
+    };
+
+    if (isPushUpWorkout) {
+      responseData.reps = parseInt(reps);
+      // Still include duration for backward compatibility, but set to 0 or a calculated value
+      responseData.duration = 0;
+    } else {
+      responseData.duration = parseFloat(duration);
+    }
+
+    return NextResponse.json(responseData);
   } catch (error: any) {
     console.error('Error calculating calories:', error);
     

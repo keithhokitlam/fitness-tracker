@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 
 interface WorkoutHistory {
   id: string;
   workoutType: string;
   duration: number;
+  reps?: number;
   calories: number;
   explanation?: string;
   timestamp: string;
@@ -15,6 +16,7 @@ interface WorkoutHistory {
 export default function Home() {
   const [workoutType, setWorkoutType] = useState('');
   const [duration, setDuration] = useState('');
+  const [reps, setReps] = useState('');
   const [runningPace, setRunningPace] = useState('');
   const [weight, setWeight] = useState('');
   const [weightUnit, setWeightUnit] = useState('lbs');
@@ -23,10 +25,62 @@ export default function Home() {
     calories: number; 
     workoutType: string; 
     duration: number;
+    reps?: number;
     explanation?: string;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistory[]>([]);
+
+  // Debug: Log component mount and test if JS is running
+  useEffect(() => {
+    console.log('[Home Component] Mounted/Updated');
+    console.log('[Home Component] Current workoutType:', workoutType);
+    // Also try to alert to ensure JS is running (comment out after testing)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('load', () => {
+        console.log('[Window Load] Page fully loaded');
+      });
+    }
+  }, []);
+
+  // Helper function to check if workout is a push-up variation
+  const isPushUp = (workout: string): boolean => {
+    try {
+      if (!workout) return false;
+      const trimmed = workout.trim();
+      if (!trimmed) return false;
+      
+      // Convert to lowercase and remove all spaces and hyphens
+      const normalized = trimmed.toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
+      
+      // Check if it matches pushup variations
+      // This handles: "push up", "push-up", "pushup", "pushups", "push ups", etc.
+      const result = normalized === 'pushup' || normalized === 'pushups' || normalized.startsWith('pushup');
+      
+      // Debug in production (remove after testing)
+      if (typeof window !== 'undefined' && trimmed.length > 0) {
+        console.log('[isPushUp]', { workout, trimmed, normalized, result });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('[isPushUp error]', error);
+      return false;
+    }
+  };
+
+  // Memoize the push-up check to ensure proper reactivity
+  const isPushUpWorkout = useMemo(() => {
+    const result = isPushUp(workoutType);
+    console.log('[useMemo] workoutType changed:', workoutType, '→ isPushUpWorkout:', result);
+    return result;
+  }, [workoutType]);
+
+  // Debug: Log whenever workoutType changes
+  useEffect(() => {
+    console.log('[useEffect] workoutType changed to:', workoutType);
+    console.log('[useEffect] isPushUpWorkout:', isPushUpWorkout);
+  }, [workoutType, isPushUpWorkout]);
 
   // Load workout history and weight from localStorage on mount
   useEffect(() => {
@@ -69,6 +123,7 @@ export default function Home() {
     calories: number; 
     workoutType: string; 
     duration: number;
+    reps?: number;
     explanation?: string;
   }) => {
     const newWorkout: WorkoutHistory = {
@@ -105,15 +160,33 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!workoutType.trim() || !duration.trim()) {
-      alert('Please fill in both workout type and duration');
+    const isPushUpWorkout = isPushUp(workoutType);
+    
+    if (!workoutType.trim()) {
+      alert('Please fill in the workout type');
       return;
     }
 
-    const durationNum = parseFloat(duration);
-    if (isNaN(durationNum) || durationNum <= 0) {
-      alert('Please enter a valid duration (in minutes)');
-      return;
+    if (isPushUpWorkout) {
+      if (!reps.trim()) {
+        alert('Please fill in the number of reps');
+        return;
+      }
+      const repsNum = parseFloat(reps);
+      if (isNaN(repsNum) || repsNum <= 0 || !Number.isInteger(repsNum)) {
+        alert('Please enter a valid number of reps (must be a positive whole number)');
+        return;
+      }
+    } else {
+      if (!duration.trim()) {
+        alert('Please fill in the duration');
+        return;
+      }
+      const durationNum = parseFloat(duration);
+      if (isNaN(durationNum) || durationNum <= 0) {
+        alert('Please enter a valid duration (in minutes)');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -130,7 +203,10 @@ export default function Home() {
         },
         body: JSON.stringify({
           workoutType: workoutType.trim(),
-          duration: durationNum,
+          ...(isPushUpWorkout 
+            ? { reps: parseInt(reps) } 
+            : { duration: parseFloat(duration) }
+          ),
           ...(isRunning && runningPace.trim() && { runningPace: runningPace.trim() }),
           ...(weight.trim() && { weight: weight.trim(), weightUnit }),
         }),
@@ -148,6 +224,7 @@ export default function Home() {
         // Clear form after successful submission
         setWorkoutType('');
         setDuration('');
+        setReps('');
         setRunningPace('');
         setWeight(''); // Clear weight so it must be entered each time
       } else {
@@ -160,6 +237,7 @@ export default function Home() {
       // Clear form after successful submission
       setWorkoutType('');
       setDuration('');
+      setReps('');
     } catch (error: any) {
       console.error('Error submitting workout:', error);
       setError(error.message || 'Failed to calculate calories. Please try again.');
@@ -258,6 +336,11 @@ export default function Home() {
             </div>
           </div>
 
+          {/* OBVIOUS DEBUG - This MUST appear if code is deployed */}
+          <div className="p-4 bg-red-500 text-white text-center font-bold text-lg mb-4 rounded-lg">
+            🔴 DEBUG VERSION - If you see this, new code is deployed! 🔴
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label 
@@ -270,7 +353,11 @@ export default function Home() {
                 type="text"
                 id="workoutType"
                 value={workoutType}
-                onChange={(e) => setWorkoutType(e.target.value)}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  console.log('[Input onChange] Setting workoutType to:', newValue);
+                  setWorkoutType(newValue);
+                }}
                 placeholder="e.g., Running, Weightlifting, Yoga, Swimming, Cycling..."
                 className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 
                          bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400
@@ -353,29 +440,64 @@ export default function Home() {
               </div>
             )}
 
-            <div className="space-y-2">
-              <label 
-                htmlFor="duration" 
-                className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
-              >
-                Duration (minutes)
-              </label>
-              <input
-                type="number"
-                id="duration"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                placeholder="e.g., 30, 45, 60..."
-                min="1"
-                step="1"
-                className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                         transition-all duration-200 shadow-sm hover:shadow-md
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSubmitting}
-              />
+            {/* Debug Panel - Remove after fixing */}
+            <div className="p-3 bg-yellow-100 dark:bg-yellow-900 border-2 border-yellow-400 rounded-lg mb-4">
+              <p className="text-xs font-bold text-yellow-800 dark:text-yellow-200">DEBUG INFO:</p>
+              <p className="text-xs text-yellow-700 dark:text-yellow-300">workoutType: "{workoutType}"</p>
+              <p className="text-xs text-yellow-700 dark:text-yellow-300">isPushUpWorkout: {isPushUpWorkout ? 'TRUE ✓' : 'FALSE ✗'}</p>
+              <p className="text-xs text-yellow-700 dark:text-yellow-300">Should show Reps: {isPushUpWorkout ? 'YES' : 'NO'}</p>
             </div>
+
+            {/* Reps Field - Only show for Push-up variations */}
+            {isPushUpWorkout ? (
+              <div className="space-y-2">
+                <label 
+                  htmlFor="reps" 
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+                >
+                  Reps
+                </label>
+                <input
+                  type="number"
+                  id="reps"
+                  value={reps}
+                  onChange={(e) => setReps(e.target.value)}
+                  placeholder="e.g., 10, 20, 50..."
+                  min="1"
+                  step="1"
+                  className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400
+                           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                           transition-all duration-200 shadow-sm hover:shadow-md
+                           disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <label 
+                  htmlFor="duration" 
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+                >
+                  Duration (minutes)
+                </label>
+                <input
+                  type="number"
+                  id="duration"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  placeholder="e.g., 30, 45, 60..."
+                  min="1"
+                  step="1"
+                  className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400
+                           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                           transition-all duration-200 shadow-sm hover:shadow-md
+                           disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                />
+              </div>
+            )}
 
             <button
               type="submit"
@@ -425,8 +547,12 @@ export default function Home() {
                   🎉 Workout Complete!
                 </h2>
                 <p className="text-gray-700 dark:text-gray-300 mb-4 text-lg">
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400">{result.workoutType}</span> for{' '}
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400">{result.duration} minutes</span>
+                  <span className="font-bold text-indigo-600 dark:text-indigo-400">{result.workoutType}</span>{' '}
+                  {result.reps ? (
+                    <>for <span className="font-bold text-indigo-600 dark:text-indigo-400">{result.reps} reps</span></>
+                  ) : (
+                    <>for <span className="font-bold text-indigo-600 dark:text-indigo-400">{result.duration} minutes</span></>
+                  )}
                 </p>
                 <div className="bg-white dark:bg-gray-800 rounded-xl p-6 mb-4 shadow-inner">
                   <p className="text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
@@ -481,9 +607,15 @@ export default function Home() {
                         <h3 className="font-bold text-lg text-gray-900 dark:text-white">
                           {workout.workoutType}
                         </h3>
-                        <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded-full">
-                          {workout.duration} min
-                        </span>
+                        {workout.reps ? (
+                          <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded-full">
+                            {workout.reps} reps
+                          </span>
+                        ) : (
+                          <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded-full">
+                            {workout.duration} min
+                          </span>
+                        )}
                       </div>
                       <p className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                         {workout.calories} calories
