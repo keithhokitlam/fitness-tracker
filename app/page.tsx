@@ -337,8 +337,9 @@ export default function Home() {
           </div>
 
           {/* OBVIOUS DEBUG - This MUST appear if code is deployed */}
+          {/* Version: 2.0.0 - Build Date: {new Date().toISOString()} */}
           <div className="p-4 bg-red-500 text-white text-center font-bold text-lg mb-4 rounded-lg">
-            🔴 DEBUG VERSION - If you see this, new code is deployed! 🔴
+            🔴 DEBUG VERSION 2.0 - Build: {typeof window !== 'undefined' ? new Date().toISOString() : 'Loading...'} - If you see this, new code is deployed! 🔴
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
