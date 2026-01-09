@@ -261,24 +261,24 @@ export default function Home() {
                   </div>
                   <div className="relative z-10">
                     <h1 
-                      className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight"
+                      className="font-extrabold text-white leading-none"
                       style={{
-                        fontFamily: "'Althetic', 'Arial Black', 'Impact', sans-serif",
+                        fontFamily: "'Chicago Athletic', Arial, sans-serif",
                         textShadow: '4px 4px 8px rgba(0, 0, 0, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.5)',
                         letterSpacing: '0.05em',
                         fontWeight: 'normal',
-                        lineHeight: '1.1',
+                        fontSize: 'clamp(5.63rem, 7.8vw + 1rem, 12rem)',
                       }}
                     >
                       <div>Fitness</div>
-                      <div>Tracker</div>
+                      <div style={{ marginTop: '-0.3em' }}>Tracker</div>
                     </h1>
                   </div>
                 </div>
                 <p 
-                  className="text-4xl sm:text-5xl md:text-6xl text-white mt-1"
+                  className="text-2xl sm:text-2xl md:text-3xl text-white mt-1"
                   style={{
-                    fontFamily: "'Chicago Athletic', Arial, sans-serif",
+                    fontFamily: "'Althetic', 'Arial Black', 'Impact', sans-serif",
                     textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.9)',
                     fontWeight: 'normal',
                   }}
