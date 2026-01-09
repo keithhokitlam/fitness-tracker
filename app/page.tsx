@@ -31,17 +31,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistory[]>([]);
 
-  // Debug: Log component mount and test if JS is running
-  useEffect(() => {
-    console.log('[Home Component] Mounted/Updated');
-    console.log('[Home Component] Current workoutType:', workoutType);
-    // Also try to alert to ensure JS is running (comment out after testing)
-    if (typeof window !== 'undefined') {
-      window.addEventListener('load', () => {
-        console.log('[Window Load] Page fully loaded');
-      });
-    }
-  }, []);
 
   // Helper function to check if workout is a push-up variation
   const isPushUp = (workout: string): boolean => {
@@ -55,14 +44,7 @@ export default function Home() {
       
       // Check if it matches pushup variations
       // This handles: "push up", "push-up", "pushup", "pushups", "push ups", etc.
-      const result = normalized === 'pushup' || normalized === 'pushups' || normalized.startsWith('pushup');
-      
-      // Debug in production (remove after testing)
-      if (typeof window !== 'undefined' && trimmed.length > 0) {
-        console.log('[isPushUp]', { workout, trimmed, normalized, result });
-      }
-      
-      return result;
+      return normalized === 'pushup' || normalized === 'pushups' || normalized.startsWith('pushup');
     } catch (error) {
       console.error('[isPushUp error]', error);
       return false;
@@ -71,16 +53,8 @@ export default function Home() {
 
   // Memoize the push-up check to ensure proper reactivity
   const isPushUpWorkout = useMemo(() => {
-    const result = isPushUp(workoutType);
-    console.log('[useMemo] workoutType changed:', workoutType, '→ isPushUpWorkout:', result);
-    return result;
+    return isPushUp(workoutType);
   }, [workoutType]);
-
-  // Debug: Log whenever workoutType changes
-  useEffect(() => {
-    console.log('[useEffect] workoutType changed to:', workoutType);
-    console.log('[useEffect] isPushUpWorkout:', isPushUpWorkout);
-  }, [workoutType, isPushUpWorkout]);
 
   // Load workout history and weight from localStorage on mount
   useEffect(() => {
@@ -336,12 +310,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* OBVIOUS DEBUG - This MUST appear if code is deployed */}
-          {/* Version: 2.0.0 - Build Date: {new Date().toISOString()} */}
-          <div className="p-4 bg-red-500 text-white text-center font-bold text-lg mb-4 rounded-lg">
-            🔴 DEBUG VERSION 2.0 - Build: {typeof window !== 'undefined' ? new Date().toISOString() : 'Loading...'} - If you see this, new code is deployed! 🔴
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label 
@@ -354,11 +322,7 @@ export default function Home() {
                 type="text"
                 id="workoutType"
                 value={workoutType}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  console.log('[Input onChange] Setting workoutType to:', newValue);
-                  setWorkoutType(newValue);
-                }}
+                onChange={(e) => setWorkoutType(e.target.value)}
                 placeholder="e.g., Running, Weightlifting, Yoga, Swimming, Cycling..."
                 className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-600 
                          bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400
@@ -440,14 +404,6 @@ export default function Home() {
                 </p>
               </div>
             )}
-
-            {/* Debug Panel - Remove after fixing */}
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-900 border-2 border-yellow-400 rounded-lg mb-4">
-              <p className="text-xs font-bold text-yellow-800 dark:text-yellow-200">DEBUG INFO:</p>
-              <p className="text-xs text-yellow-700 dark:text-yellow-300">workoutType: "{workoutType}"</p>
-              <p className="text-xs text-yellow-700 dark:text-yellow-300">isPushUpWorkout: {isPushUpWorkout ? 'TRUE ✓' : 'FALSE ✗'}</p>
-              <p className="text-xs text-yellow-700 dark:text-yellow-300">Should show Reps: {isPushUpWorkout ? 'YES' : 'NO'}</p>
-            </div>
 
             {/* Reps Field - Only show for Push-up variations */}
             {isPushUpWorkout ? (
