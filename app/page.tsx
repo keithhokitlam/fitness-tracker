@@ -252,13 +252,11 @@ export default function Home() {
                 >
                   {/* Metal Plate Image Background */}
                   <div className="absolute inset-0 rounded-lg overflow-hidden">
-                    <Image
+                    <img
                       src="/logos/Metal Plate.jpg"
                       alt=""
-                      fill
-                      className="object-cover"
-                      priority
-                      unoptimized
+                      className="w-full h-full object-cover"
+                      style={{ position: 'absolute', top: 0, left: 0 }}
                     />
                   </div>
                   <div className="relative z-10">
